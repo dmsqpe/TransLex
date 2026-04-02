@@ -1,0 +1,13 @@
+{
+    "name": "translex",
+    "version": "1.0.0",
+    "private": true,
+    "description": "TransLex com frontend publico e backend Gemini pronto para deploy no Render.",
+    "scripts": {
+        "start": "node server.js",
+        "dev": "node server.js"
+    },
+    "engines": {
+        "node": ">=20"
+    }
+}

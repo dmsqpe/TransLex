@@ -1,0 +1,22 @@
+{
+    "manifest_version": 3,
+    "name": "TransLex",
+    "version": "1.0.0",
+    "description": "Extensao de traducao com apoio de dicionario, contexto e simulacao de conversa.",
+    "permissions": [
+        "contextMenus",
+        "storage",
+        "tabs"
+    ],
+    "action": {
+        "default_title": "TransLex",
+        "default_popup": "Extensao.html"
+    },
+    "background": {
+        "service_worker": "background.js"
+    },
+    "host_permissions": [
+        "http://localhost:3000/*",
+        "https://*.onrender.com/*"
+    ]
+}

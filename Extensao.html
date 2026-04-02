@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TransLex</title>
+    <link rel="stylesheet" href="css.css">
+</head>
+<body>
+    <main class="app-shell">
+        <header class="topbar">
+            <div>
+                <p class="eyebrow">Traducao contextual</p>
+                <h1>TransLex</h1>
+            </div>
+            <div class="topbar-meta">
+                <label class="ui-language-picker">
+                    <span id="uiLanguageLabel">Interface</span>
+                    <select id="uiLanguageSelect"></select>
+                </label>
+                <button id="themeToggleButton" class="theme-button" type="button">Tema noturno</button>
+                <span id="shellBadge" class="shell-badge">Carregando...</span>
+                <span id="detectionBadge" class="tag">Aguardando texto</span>
+            </div>
+        </header>
+
+        <section class="workspace">
+            <section class="translator-panel card">
+                <div class="panel-title-row">
+                    <div>
+                        <h2>Tradutor</h2>
+                        <p class="panel-copy">Traduza e Aprenda!</p>
+                    </div>
+                </div>
+
+                <div class="language-row">
+                    <label class="field">
+                        <span>Origem</span>
+                        <select id="sourceLanguage"></select>
+                    </label>
+
+                    <button id="swapLanguages" class="swap-button" type="button" aria-label="Trocar idiomas">Trocar</button>
+
+                    <label class="field">
+                        <span>Destino</span>
+                        <select id="targetLanguage"></select>
+                    </label>
+                </div>
+
+                <div class="text-grid">
+                    <label class="field">
+                        <span>Texto original</span>
+                        <textarea id="sourceText" placeholder="Digite uma palavra, frase ou pequeno dialogo..."></textarea>
+                    </label>
+
+                    <label class="field">
+                        <span>Traducao final</span>
+                        <textarea id="translatedText" readonly></textarea>
+                    </label>
+                </div>
+
+                <div class="toolbar">
+                    <button id="translateButton" class="primary-button" type="button">Traduzir</button>
+                    <button id="conversationButton" class="secondary-button" type="button">Simular conversa</button>
+                    <button id="clearButton" class="ghost-button" type="button">Limpar texto</button>
+                </div>
+
+                <p id="statusMessage" class="status-message">Pronto para traduzir.</p>
+            </section>
+
+            <aside class="history-panel card">
+                <div class="panel-title-row">
+                    <div>
+                        <h2>Historico</h2>
+                        <p class="panel-copy">O ultimo texto e as ultimas traducoes ficam salvos no navegador.</p>
+                    </div>
+                    <button id="clearHistoryButton" class="ghost-button small-button" type="button">Limpar historico</button>
+                </div>
+
+                <div class="backend-config">
+                    <label class="field">
+                        <span id="backendUrlLabel">URL do backend</span>
+                        <input id="backendUrlInput" type="url" placeholder="https://seu-app.onrender.com">
+                    </label>
+                    <button id="saveBackendUrlButton" class="ghost-button small-button" type="button">Salvar URL</button>
+                </div>
+
+                <div id="historyList" class="history-list"></div>
+            </aside>
+        </section>
+
+        <section class="insights-grid">
+            <article class="card">
+                <div class="panel-title-row">
+                    <div>
+                        <h2>Analise</h2>
+                        <p class="panel-copy">Resumo curto da traducao e do tom geral.</p>
+                    </div>
+                </div>
+                <ul id="analysisList" class="analysis-list"></ul>
+            </article>
+
+            <article class="card">
+                <div class="panel-title-row">
+                    <div>
+                        <h2>Dicionario e contexto</h2>
+                        <p class="panel-copy">Nuances, significado principal e variacoes de uso.</p>
+                    </div>
+                </div>
+                <div id="dictionaryPanel" class="dictionary-panel"></div>
+            </article>
+        </section>
+
+        <section class="card conversation-panel">
+            <div class="panel-title-row">
+                <div>
+                    <h2>Conversa simulada</h2>
+                    <p class="panel-copy">Exemplo rapido de como a frase pode aparecer na pratica.</p>
+                </div>
+            </div>
+            <div id="conversationPanel" class="conversation-lines"></div>
+        </section>
+    </main>
+
+    <script src="js.js"></script>
+</body>
+</html>
