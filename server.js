@@ -11,7 +11,13 @@ const STATIC_FILES = {
     "/index.html": { file: "Extensao.html", type: "text/html; charset=utf-8" },
     "/Extensao.html": { file: "Extensao.html", type: "text/html; charset=utf-8" },
     "/css.css": { file: "css.css", type: "text/css; charset=utf-8" },
-    "/js.js": { file: "js.js", type: "application/javascript; charset=utf-8" }
+    "/js.js": { file: "js.js", type: "application/javascript; charset=utf-8" },
+    "/site.webmanifest": { file: "site.webmanifest", type: "application/manifest+json; charset=utf-8" }
+};
+
+const STATIC_ICON_TYPES = {
+    ".png": "image/png",
+    ".ico": "image/x-icon"
 };
 
 function sendJson(res, statusCode, payload) {
@@ -36,6 +42,28 @@ async function serveStaticFile(res, pathname) {
 
     res.writeHead(200, {
         "Content-Type": entry.type
+    });
+    res.end(contents);
+    return true;
+}
+
+async function serveIconFile(res, pathname) {
+    if (!pathname.startsWith("/icons/")) {
+        return false;
+    }
+
+    const requestedName = path.basename(pathname);
+    const safePath = path.join(__dirname, "icons", requestedName);
+    const extension = path.extname(requestedName).toLowerCase();
+    const contentType = STATIC_ICON_TYPES[extension];
+
+    if (!contentType) {
+        return false;
+    }
+
+    const contents = await fs.readFile(safePath);
+    res.writeHead(200, {
+        "Content-Type": contentType
     });
     res.end(contents);
     return true;
@@ -307,6 +335,21 @@ const server = http.createServer(async (req, res) => {
         }
 
         return;
+    }
+
+    if (req.method === "GET" && url.pathname.startsWith("/icons/")) {
+        try {
+            const served = await serveIconFile(res, url.pathname);
+
+            if (served) {
+                return;
+            }
+        } catch (error) {
+            sendJson(res, 404, {
+                error: "Icone nao encontrado."
+            });
+            return;
+        }
     }
 
     if (req.method === "POST" && url.pathname === "/translate") {

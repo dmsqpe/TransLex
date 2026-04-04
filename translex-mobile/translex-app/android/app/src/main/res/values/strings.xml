@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">TransLex</string>
+    <string name="title_activity_main">TransLex</string>
+    <string name="package_name">com.dmsqpe.translex</string>
+    <string name="custom_url_scheme">com.dmsqpe.translex</string>
+</resources>

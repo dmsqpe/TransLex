@@ -1,0 +1,9 @@
+{
+  "appId": "com.dmsqpe.translex",
+  "appName": "TransLex",
+  "webDir": "www",
+  "server": {
+    "url": "https://translex-46nz.onrender.com",
+    "cleartext": false
+  }
+}
