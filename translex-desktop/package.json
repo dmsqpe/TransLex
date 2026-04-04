@@ -1,8 +1,8 @@
 {
   "name": "translex-desktop",
-  "productName": "translex-desktop",
+  "productName": "TransLex",
   "version": "1.0.0",
-  "description": "My Electron application description",
+  "description": "Aplicativo desktop do TransLex",
   "main": "src/index.js",
   "private": true,
   "scripts": {

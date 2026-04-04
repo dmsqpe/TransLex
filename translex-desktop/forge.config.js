@@ -1,15 +1,31 @@
+const fs = require('fs');
+const path = require('path');
 const { FusesPlugin } = require('@electron-forge/plugin-fuses');
 const { FuseV1Options, FuseVersion } = require('@electron/fuses');
+
+const iconBasePath = path.resolve(__dirname, 'assets', 'translex-icon');
+const iconPngPath = `${iconBasePath}.png`;
+const iconIcoPath = `${iconBasePath}.ico`;
+const iconIcnsPath = `${iconBasePath}.icns`;
+const packagerIcon =
+  process.platform === 'darwin'
+    ? (fs.existsSync(iconIcnsPath) ? iconBasePath : undefined)
+    : (fs.existsSync(iconIcoPath) ? iconBasePath : undefined);
 
 module.exports = {
   packagerConfig: {
     asar: true,
+    icon: packagerIcon,
   },
   rebuildConfig: {},
   makers: [
     {
       name: '@electron-forge/maker-squirrel',
-      config: {},
+      config: fs.existsSync(iconIcoPath)
+        ? {
+            setupIcon: iconIcoPath,
+          }
+        : {},
     },
     {
       name: '@electron-forge/maker-zip',
@@ -17,11 +33,23 @@ module.exports = {
     },
     {
       name: '@electron-forge/maker-deb',
-      config: {},
+      config: fs.existsSync(iconPngPath)
+        ? {
+            options: {
+              icon: iconPngPath,
+            },
+          }
+        : {},
     },
     {
       name: '@electron-forge/maker-rpm',
-      config: {},
+      config: fs.existsSync(iconPngPath)
+        ? {
+            options: {
+              icon: iconPngPath,
+            },
+          }
+        : {},
     },
   ],
   plugins: [

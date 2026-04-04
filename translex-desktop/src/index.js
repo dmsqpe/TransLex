@@ -1,10 +1,14 @@
+const path = require('path');
 const { app, BrowserWindow } = require('electron');
+
+const desktopIconPath = path.join(__dirname, '..', 'assets', 'translex-icon.png');
 
 function createWindow() {
   const win = new BrowserWindow({
     width: 1200,
     height: 800,
     autoHideMenuBar: true,
+    icon: desktopIconPath,
     webPreferences: {
       contextIsolation: true,
       nodeIntegration: false
@@ -15,6 +19,10 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
+  if (process.platform === 'darwin' && app.dock) {
+    app.dock.setIcon(desktopIconPath);
+  }
+
   createWindow();
 
   app.on('activate', () => {
