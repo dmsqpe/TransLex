@@ -898,6 +898,7 @@ function getInterfaceLanguageLabel(code) {
 function setUiLanguageMenuOpen(open) {
     isUiLanguageMenuOpen = Boolean(open);
     uiLanguagePicker.classList.toggle("is-open", isUiLanguageMenuOpen);
+    uiLanguageMenu.classList.toggle("is-open", isUiLanguageMenuOpen);
     uiLanguageTrigger.setAttribute("aria-expanded", String(isUiLanguageMenuOpen));
 }
 
