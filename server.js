@@ -6,6 +6,9 @@ const { URL } = require("url");
 const PORT = Number(process.env.PORT || 3000);
 const API_KEY = process.env.GEMINI_API_KEY;
 const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash";
+const GITHUB_MODELS_TOKEN = process.env.GITHUB_MODELS_TOKEN || process.env.COPILOT_FALLBACK_TOKEN || "";
+const GITHUB_MODELS_MODEL = process.env.GITHUB_MODELS_MODEL || process.env.COPILOT_FALLBACK_MODEL || "openai/gpt-4.1-mini";
+const GITHUB_MODELS_ENDPOINT = process.env.GITHUB_MODELS_ENDPOINT || "https://models.github.ai/inference/chat/completions";
 const STATIC_FILES = {
     "/": { file: "Extensao.html", type: "text/html; charset=utf-8" },
     "/index.html": { file: "Extensao.html", type: "text/html; charset=utf-8" },
@@ -236,6 +239,69 @@ async function callGeminiApi(parts, responseMimeType = "application/json") {
     return text;
 }
 
+async function callGitHubModelsApi(prompt, responseType = "json") {
+    if (!GITHUB_MODELS_TOKEN) {
+        throw new Error("GITHUB_MODELS_TOKEN ou COPILOT_FALLBACK_TOKEN nao configurado.");
+    }
+
+    const body = {
+        model: GITHUB_MODELS_MODEL,
+        messages: [
+            {
+                role: "user",
+                content: prompt
+            }
+        ],
+        temperature: 0.4
+    };
+
+    if (responseType === "json") {
+        body.response_format = {
+            type: "json_object"
+        };
+    }
+
+    const response = await fetch(GITHUB_MODELS_ENDPOINT, {
+        method: "POST",
+        headers: {
+            "Accept": "application/vnd.github+json",
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${GITHUB_MODELS_TOKEN}`,
+            "X-GitHub-Api-Version": "2026-03-10"
+        },
+        body: JSON.stringify(body)
+    });
+
+    if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`GitHub Models fallback retornou erro: ${response.status} ${errorText}`);
+    }
+
+    const data = await response.json();
+    const text = data.choices?.[0]?.message?.content;
+
+    if (!text) {
+        throw new Error("GitHub Models fallback nao retornou texto.");
+    }
+
+    return text;
+}
+
+async function generateGeminiText(prompt, responseType = "json") {
+    return callGeminiApi(
+        [
+            {
+                text: prompt
+            }
+        ],
+        responseType === "json" ? "application/json" : "text/plain"
+    );
+}
+
+async function generateGitHubModelsText(prompt, responseType = "json") {
+    return callGitHubModelsApi(prompt, responseType);
+}
+
 function buildTranslationPrompt(chunkText, sourceLanguage, targetLanguage) {
     return `
 Voce e um tradutor profissional.
@@ -258,18 +324,14 @@ ${chunkText}
 `.trim();
 }
 
-async function translateFullText(sourceText, sourceLanguage, targetLanguage) {
+async function translateFullText(sourceText, sourceLanguage, targetLanguage, generateText) {
     const chunks = splitLongText(sourceText);
     const translatedChunks = [];
 
     for (const chunk of chunks) {
-        const translatedChunk = await callGeminiApi(
-            [
-                {
-                    text: buildTranslationPrompt(chunk, sourceLanguage, targetLanguage)
-                }
-            ],
-            "text/plain"
+        const translatedChunk = await generateText(
+            buildTranslationPrompt(chunk, sourceLanguage, targetLanguage),
+            "text"
         );
 
         translatedChunks.push(translatedChunk.trim());
@@ -278,19 +340,18 @@ async function translateFullText(sourceText, sourceLanguage, targetLanguage) {
     return translatedChunks.join("\n\n");
 }
 
-async function callGemini(sourceText, sourceLanguage, targetLanguage, uiLanguage) {
-    const translatedText = await translateFullText(sourceText, sourceLanguage, targetLanguage);
+async function callProvider(providerName, modelName, generateText, sourceText, sourceLanguage, targetLanguage, uiLanguage) {
+    const translatedText = await translateFullText(sourceText, sourceLanguage, targetLanguage, generateText);
     const sourceExcerpt = createExcerpt(sourceText);
     const translatedExcerpt = createExcerpt(translatedText);
-    const summaryText = await callGeminiApi([
-        {
-            text: buildSummaryPrompt(sourceExcerpt, translatedExcerpt, sourceLanguage, targetLanguage, uiLanguage)
-        }
-    ]);
+    const summaryText = await generateText(
+        buildSummaryPrompt(sourceExcerpt, translatedExcerpt, sourceLanguage, targetLanguage, uiLanguage),
+        "json"
+    );
     const parsed = parseJsonText(summaryText);
 
     return {
-        provider: `Gemini API (${GEMINI_MODEL})`,
+        provider: `${providerName} (${modelName})`,
         detected: sourceLanguage,
         target: targetLanguage,
         translation: translatedText,
@@ -300,6 +361,48 @@ async function callGemini(sourceText, sourceLanguage, targetLanguage, uiLanguage
         tone: parsed.tone,
         conversation: parsed.conversation
     };
+}
+
+async function callGemini(sourceText, sourceLanguage, targetLanguage, uiLanguage) {
+    return callProvider(
+        "Gemini API",
+        GEMINI_MODEL,
+        generateGeminiText,
+        sourceText,
+        sourceLanguage,
+        targetLanguage,
+        uiLanguage
+    );
+}
+
+async function callCopilotFallback(sourceText, sourceLanguage, targetLanguage, uiLanguage) {
+    return callProvider(
+        "GitHub Models fallback",
+        GITHUB_MODELS_MODEL,
+        generateGitHubModelsText,
+        sourceText,
+        sourceLanguage,
+        targetLanguage,
+        uiLanguage
+    );
+}
+
+async function translateWithFallback(sourceText, sourceLanguage, targetLanguage, uiLanguage) {
+    try {
+        return await callGemini(sourceText, sourceLanguage, targetLanguage, uiLanguage);
+    } catch (geminiError) {
+        try {
+            const fallbackResult = await callCopilotFallback(sourceText, sourceLanguage, targetLanguage, uiLanguage);
+
+            return {
+                ...fallbackResult,
+                fallbackFrom: "Gemini API",
+                fallbackReason: geminiError.message
+            };
+        } catch (fallbackError) {
+            throw new Error(`Gemini falhou: ${geminiError.message} | Fallback falhou: ${fallbackError.message}`);
+        }
+    }
 }
 
 const server = http.createServer(async (req, res) => {
@@ -315,7 +418,10 @@ const server = http.createServer(async (req, res) => {
             ok: true,
             apiKeyConfigured: Boolean(API_KEY),
             provider: "Gemini API",
-            model: GEMINI_MODEL
+            model: GEMINI_MODEL,
+            fallbackProvider: "GitHub Models",
+            fallbackConfigured: Boolean(GITHUB_MODELS_TOKEN),
+            fallbackModel: GITHUB_MODELS_MODEL
         });
         return;
     }
@@ -362,7 +468,7 @@ const server = http.createServer(async (req, res) => {
         req.on("end", async () => {
             try {
                 const body = JSON.parse(rawBody || "{}");
-                const result = await callGemini(
+                const result = await translateWithFallback(
                     body.sourceText || "",
                     body.sourceLanguage || "auto",
                     body.targetLanguage || "en",
