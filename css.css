@@ -85,9 +85,13 @@ body[data-shell="popup"] .app-shell {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    gap: 18px;
-    padding: 18px 20px;
+    gap: 14px;
+    padding: 16px 18px;
     margin-bottom: 16px;
+}
+
+.topbar-brand {
+    max-width: 520px;
 }
 
 .eyebrow {
@@ -111,6 +115,14 @@ h1 {
     font-size: 28px;
 }
 
+.topbar-copy {
+    margin: 8px 0 0;
+    max-width: 38ch;
+    color: var(--muted);
+    line-height: 1.5;
+    font-size: 13px;
+}
+
 h2 {
     margin-bottom: 4px;
     font-size: 20px;
@@ -121,29 +133,96 @@ h2 {
     gap: 8px;
     flex-wrap: wrap;
     justify-content: flex-end;
+    align-items: center;
 }
 
 .ui-language-picker {
+    position: relative;
+}
+
+.ui-language-trigger {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    background: rgba(255, 255, 255, 0.6);
+    gap: 10px;
+    min-height: 38px;
+    padding: 8px 12px;
     border: 1px solid var(--line);
     border-radius: 999px;
-    padding: 6px 10px;
+    background: rgba(255, 255, 255, 0.72);
+    color: var(--ink);
+    box-shadow: 0 8px 18px rgba(29, 42, 33, 0.08);
+}
+
+.ui-language-trigger span {
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.ui-language-trigger strong {
     font-size: 12px;
+    font-weight: 800;
+}
+
+.ui-language-trigger::after {
+    content: "▾";
+    font-size: 11px;
+    color: var(--muted);
+}
+
+.ui-language-menu {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    z-index: 30;
+    display: none;
+    gap: 6px;
+    min-width: 180px;
+    max-height: 260px;
+    overflow: auto;
+    padding: 10px;
+    background: var(--surface-strong);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    box-shadow: 0 20px 36px rgba(15, 28, 20, 0.18);
+}
+
+.ui-language-picker.is-open .ui-language-menu {
+    display: grid;
+}
+
+.ui-language-option {
+    width: 100%;
+    justify-content: flex-start;
+    padding: 10px 12px;
+    border-radius: 12px;
+    background: transparent;
+    color: var(--ink);
+    text-align: left;
+    font-size: 13px;
     font-weight: 700;
 }
 
-.ui-language-picker select {
-    min-width: 92px;
-    border: none;
-    background: transparent;
-    padding: 0;
+.ui-language-option.is-active {
+    background: var(--accent-soft);
+    color: var(--accent-strong);
 }
 
-body[data-theme="dark"] .ui-language-picker {
+body[data-theme="dark"] .ui-language-trigger {
     background: rgba(255, 255, 255, 0.04);
+    box-shadow: none;
+}
+
+body[data-theme="dark"] .ui-language-menu {
+    background: #121a17;
+    box-shadow: 0 20px 36px rgba(0, 0, 0, 0.34);
+}
+
+body[data-theme="dark"] .ui-language-option.is-active {
+    background: var(--accent);
+    color: #08251e;
 }
 
 .shell-badge,
@@ -338,21 +417,6 @@ body[data-theme="dark"] .swap-button {
     padding: 0;
 }
 
-.backend-config {
-    display: grid;
-    gap: 10px;
-    margin-bottom: 14px;
-}
-
-.backend-config input {
-    width: 100%;
-    border: 1px solid var(--line);
-    border-radius: 14px;
-    background: var(--surface-strong);
-    color: var(--ink);
-    padding: 12px 14px;
-}
-
 .analysis-list {
     list-style: none;
 }
@@ -476,6 +540,11 @@ body[data-shell="popup"] h1 {
     font-size: 22px;
 }
 
+body[data-shell="popup"] .topbar-copy {
+    margin-top: 8px;
+    font-size: 13px;
+}
+
 body[data-shell="popup"] .workspace,
 body[data-shell="popup"] .insights-grid,
 body[data-shell="popup"] .text-grid {
@@ -497,6 +566,13 @@ body[data-shell="popup"] .conversation-line,
 body[data-shell="mobile"] .language-row,
 body[data-shell="mobile"] .conversation-line {
     flex-direction: column;
+}
+
+body[data-shell="popup"] .ui-language-menu,
+body[data-shell="mobile"] .ui-language-menu {
+    left: 0;
+    right: auto;
+    min-width: min(220px, 100%);
 }
 
 body[data-shell="popup"] .swap-button,
@@ -522,6 +598,7 @@ body[data-shell="mobile"] .topbar {
 
 body[data-shell="mobile"] .topbar-meta {
     justify-content: flex-start;
+    width: 100%;
 }
 
 body[data-shell="mobile"] textarea {

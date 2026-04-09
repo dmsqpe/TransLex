@@ -14,15 +14,19 @@
 <body>
     <main class="app-shell">
         <header class="topbar">
-            <div>
+            <div class="topbar-brand">
                 <p class="eyebrow">Traducao contextual</p>
                 <h1>TransLex</h1>
+                <p id="topbarCopy" class="topbar-copy">Traduza e aprenda com contexto real.</p>
             </div>
             <div class="topbar-meta">
-                <label class="ui-language-picker">
-                    <span id="uiLanguageLabel">Interface</span>
-                    <select id="uiLanguageSelect"></select>
-                </label>
+                <div id="uiLanguagePicker" class="ui-language-picker">
+                    <button id="uiLanguageTrigger" class="ui-language-trigger" type="button" aria-haspopup="true" aria-expanded="false">
+                        <span id="uiLanguageLabel">Interface</span>
+                        <strong id="uiLanguageCurrent">Portugues</strong>
+                    </button>
+                    <div id="uiLanguageMenu" class="ui-language-menu"></div>
+                </div>
                 <button id="themeToggleButton" class="theme-button" type="button">Tema noturno</button>
                 <span id="shellBadge" class="shell-badge">Carregando...</span>
                 <span id="detectionBadge" class="tag">Aguardando texto</span>
@@ -80,14 +84,6 @@
                         <p class="panel-copy">O ultimo texto e as ultimas traducoes ficam salvos no navegador.</p>
                     </div>
                     <button id="clearHistoryButton" class="ghost-button small-button" type="button">Limpar historico</button>
-                </div>
-
-                <div class="backend-config">
-                    <label class="field">
-                        <span id="backendUrlLabel">URL do backend</span>
-                        <input id="backendUrlInput" type="url" placeholder="https://seu-app.onrender.com">
-                    </label>
-                    <button id="saveBackendUrlButton" class="ghost-button small-button" type="button">Salvar URL</button>
                 </div>
 
                 <div id="historyList" class="history-list"></div>
