@@ -52,6 +52,13 @@ body[data-theme="dark"] {
     --shadow: 0 18px 44px rgba(0, 0, 0, 0.32);
 }
 
+body.essence-mode {
+    background:
+        radial-gradient(circle at 50% 8%, rgba(255, 255, 255, 0.2), transparent 18%),
+        radial-gradient(circle at 50% 28%, rgba(29, 124, 103, 0.3), transparent 30%),
+        linear-gradient(180deg, #09110e 0%, #18241f 58%, #050807 100%);
+}
+
 body[data-shell="popup"] {
     width: 420px;
     min-width: 420px;
@@ -70,6 +77,96 @@ body[data-shell="mobile"] {
 body[data-shell="popup"] .app-shell {
     max-width: 100%;
     padding: 12px;
+}
+
+.essence-egg {
+    position: fixed;
+    inset: 0;
+    z-index: 80;
+    display: grid;
+    place-items: center;
+    padding: 18px;
+    pointer-events: none;
+    opacity: 0;
+    transform: scale(0.98);
+    transition: opacity 0.28s ease, transform 0.28s ease;
+}
+
+.essence-egg.is-active {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.essence-egg-backdrop {
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(circle at 50% 32%, rgba(75, 196, 168, 0.32), transparent 28%),
+        linear-gradient(180deg, rgba(4, 9, 7, 0.18), rgba(4, 9, 7, 0.72));
+    backdrop-filter: blur(2px) saturate(1.25);
+}
+
+.essence-egg-card {
+    position: relative;
+    display: grid;
+    justify-items: center;
+    gap: 12px;
+    width: min(430px, calc(100vw - 28px));
+    padding: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 28px;
+    background: linear-gradient(180deg, rgba(10, 18, 15, 0.62), rgba(10, 18, 15, 0.34));
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.42);
+    pointer-events: auto;
+}
+
+.essence-egg-kicker {
+    margin: 0;
+    color: rgba(236, 243, 238, 0.74);
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+}
+
+.essence-egg-cover-button {
+    width: min(320px, 72vw);
+    aspect-ratio: 1;
+    padding: 0;
+    border-radius: 24px;
+    background: transparent;
+    box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.22),
+        0 24px 70px rgba(0, 0, 0, 0.44),
+        0 0 90px rgba(75, 196, 168, 0.28);
+    overflow: hidden;
+}
+
+.essence-egg-cover-button:hover {
+    transform: translateY(-3px) scale(1.01);
+}
+
+.essence-egg-cover-button img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+}
+
+.essence-egg-copy {
+    text-align: center;
+    color: #ecf3ee;
+}
+
+.essence-egg-copy h2 {
+    margin-bottom: 6px;
+    font-size: clamp(20px, 5vw, 30px);
+}
+
+.essence-egg-copy p {
+    margin: 0;
+    color: rgba(236, 243, 238, 0.74);
+    line-height: 1.45;
 }
 
 .topbar,
@@ -544,6 +641,28 @@ body[data-shell="popup"] h1 {
 
 body[data-shell="popup"] .topbar-copy {
     margin-top: 8px;
+    font-size: 13px;
+}
+
+body[data-shell="popup"] .essence-egg {
+    align-items: start;
+    padding-top: 22px;
+}
+
+body[data-shell="popup"] .essence-egg-card {
+    width: min(360px, calc(100vw - 24px));
+    padding: 12px;
+}
+
+body[data-shell="popup"] .essence-egg-cover-button {
+    width: min(240px, 64vw);
+}
+
+body[data-shell="popup"] .essence-egg-copy h2 {
+    font-size: 20px;
+}
+
+body[data-shell="popup"] .essence-egg-copy p {
     font-size: 13px;
 }
 

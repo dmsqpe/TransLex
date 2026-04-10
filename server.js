@@ -311,7 +311,7 @@ async function serveIconFile(res, pathname) {
         return false;
     }
 
-    const requestedName = path.basename(pathname);
+    const requestedName = path.basename(decodeURIComponent(pathname));
     const safePath = path.join(__dirname, "icons", requestedName);
     const extension = path.extname(requestedName).toLowerCase();
     const contentType = STATIC_ICON_TYPES[extension];

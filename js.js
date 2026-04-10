@@ -17,6 +17,8 @@ const languageOptions = [
 const languageNames = Object.fromEntries(languageOptions.map((item) => [item.value, item.label]));
 const layoutLanguageOptions = languageOptions.filter((item) => item.value !== "auto");
 const PUBLIC_APP_URL = "https://translex-46nz.onrender.com";
+const ESSENCE_EGG_COVER_URL = "icons/piff%20(2).png";
+const ESSENCE_EGG_ALBUM_URL = "https://open.spotify.com/album/3aeHFCabFVjR7LKiOk6uYf?si=vXv2YliCTZSmwArvUW4UMQ";
 const interfaceLanguageLabels = {
     pt: "Portugues",
     en: "English",
@@ -777,6 +779,9 @@ const uiLanguagePicker = document.getElementById("uiLanguagePicker");
 const uiLanguageTrigger = document.getElementById("uiLanguageTrigger");
 const uiLanguageCurrent = document.getElementById("uiLanguageCurrent");
 const uiLanguageMenu = document.getElementById("uiLanguageMenu");
+const essenceEgg = document.getElementById("essenceEgg");
+const essenceEggCover = document.getElementById("essenceEggCover");
+const essenceEggCoverButton = document.getElementById("essenceEggCoverButton");
 
 let appState = {
     uiLanguage: "pt",
@@ -790,9 +795,42 @@ let appState = {
 };
 
 let isUiLanguageMenuOpen = false;
+let isEssenceEggActive = false;
 
 function normalizeText(text) {
     return (text || "").trim().toLowerCase();
+}
+
+function normalizeEssenceQuestion(text) {
+    return String(text || "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase()
+        .replace(/[?!.,;:()[\]{}"'`´~^<>\\/|_-]+/g, " ")
+        .replace(/\b(oque|oq)\b/g, "o que")
+        .replace(/\bq\b/g, "que")
+        .replace(/\b(vcs|vc|voce|vce|ce|c)\b/g, "voce")
+        .replace(/\b(v|ve|ver|enxerga|enxergar)\b/g, "ve")
+        .replace(/\b(essencia|essense|essenciaa)\b/g, "essencia")
+        .replace(/\s+/g, " ")
+        .trim();
+}
+
+function isEssenceQuestion(text) {
+    const normalized = normalizeEssenceQuestion(text);
+
+    return /^(o )?que voce ve (na|em) (sua|tua) essencia$/.test(normalized);
+}
+
+function setEssenceEggActive(active) {
+    isEssenceEggActive = Boolean(active);
+    document.body.classList.toggle("essence-mode", isEssenceEggActive);
+    essenceEgg.classList.toggle("is-active", isEssenceEggActive);
+    essenceEgg.setAttribute("aria-hidden", String(!isEssenceEggActive));
+}
+
+function syncEssenceEgg() {
+    setEssenceEggActive(isEssenceQuestion(sourceText.value));
 }
 
 function getUiLanguage() {
@@ -1349,6 +1387,7 @@ function restoreDraft() {
     sourceText.value = appState.sourceText || DEFAULT_TEXT;
     translatedText.value = appState.translatedText || "";
     applyTheme(appState.theme || "light");
+    syncEssenceEgg();
 }
 
 function formatTimestamp(isoString) {
@@ -1405,6 +1444,7 @@ function useHistoryEntry(id) {
     sourceText.value = entry.sourceText || "";
     translatedText.value = entry.translatedText || "";
     syncDraftState();
+    syncEssenceEgg();
     statusMessage.textContent = getUiText("historyItemRestored");
 }
 
@@ -1481,6 +1521,7 @@ function clearCurrentDraft() {
     appState.sourceText = "";
     appState.translatedText = "";
     appState.lastResult = null;
+    setEssenceEggActive(false);
     saveState();
 }
 
@@ -1519,6 +1560,7 @@ async function applyPendingSelectionFromExtension() {
     }
 
     syncDraftState();
+    syncEssenceEgg();
     statusMessage.textContent = getUiText("pendingSelectionLoaded");
 
     await setExtensionLocal({
@@ -1535,6 +1577,15 @@ function wireEvents() {
     clearButton.addEventListener("click", clearCurrentDraft);
     clearHistoryButton.addEventListener("click", clearHistory);
     themeToggleButton.addEventListener("click", toggleTheme);
+    essenceEggCover.src = ESSENCE_EGG_COVER_URL;
+    essenceEggCoverButton.addEventListener("click", () => {
+        if (ESSENCE_EGG_ALBUM_URL) {
+            window.open(ESSENCE_EGG_ALBUM_URL, "_blank", "noopener,noreferrer");
+            return;
+        }
+
+        statusMessage.textContent = "Easter egg ativado. Link do album ainda nao configurado no codigo.";
+    });
     uiLanguageTrigger.addEventListener("click", (event) => {
         event.preventDefault();
         event.stopPropagation();
@@ -1572,7 +1623,10 @@ function wireEvents() {
         runTranslation();
     });
 
-    sourceText.addEventListener("input", syncDraftState);
+    sourceText.addEventListener("input", () => {
+        syncDraftState();
+        syncEssenceEgg();
+    });
     sourceLanguage.addEventListener("change", syncDraftState);
     targetLanguage.addEventListener("change", syncDraftState);
 
