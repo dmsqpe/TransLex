@@ -782,6 +782,7 @@ const uiLanguageMenu = document.getElementById("uiLanguageMenu");
 const essenceEgg = document.getElementById("essenceEgg");
 const essenceEggCover = document.getElementById("essenceEggCover");
 const essenceEggCoverButton = document.getElementById("essenceEggCoverButton");
+const essenceEggCloseButton = document.getElementById("essenceEggCloseButton");
 
 let appState = {
     uiLanguage: "pt",
@@ -796,6 +797,8 @@ let appState = {
 
 let isUiLanguageMenuOpen = false;
 let isEssenceEggActive = false;
+let isEssenceEggDismissed = false;
+let lastEssenceEggInput = "";
 
 function normalizeText(text) {
     return (text || "").trim().toLowerCase();
@@ -830,7 +833,21 @@ function setEssenceEggActive(active) {
 }
 
 function syncEssenceEgg() {
-    setEssenceEggActive(isEssenceQuestion(sourceText.value));
+    const currentText = sourceText.value;
+    const currentNormalized = normalizeEssenceQuestion(currentText);
+    const isQuestion = isEssenceQuestion(currentText);
+
+    if (currentNormalized !== lastEssenceEggInput) {
+        isEssenceEggDismissed = false;
+        lastEssenceEggInput = currentNormalized;
+    }
+
+    setEssenceEggActive(isQuestion && !isEssenceEggDismissed);
+}
+
+function dismissEssenceEgg() {
+    isEssenceEggDismissed = true;
+    setEssenceEggActive(false);
 }
 
 function getUiLanguage() {
@@ -1586,6 +1603,7 @@ function wireEvents() {
 
         statusMessage.textContent = "Easter egg ativado. Link do album ainda nao configurado no codigo.";
     });
+    essenceEggCloseButton.addEventListener("click", dismissEssenceEgg);
     uiLanguageTrigger.addEventListener("click", (event) => {
         event.preventDefault();
         event.stopPropagation();

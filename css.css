@@ -88,13 +88,16 @@ body[data-shell="popup"] .app-shell {
     padding: 18px;
     pointer-events: none;
     opacity: 0;
+    visibility: hidden;
     transform: scale(0.98);
-    transition: opacity 0.28s ease, transform 0.28s ease;
+    transition: opacity 0.28s ease, transform 0.28s ease, visibility 0.28s ease;
 }
 
 .essence-egg.is-active {
     opacity: 1;
+    visibility: visible;
     transform: scale(1);
+    pointer-events: auto;
 }
 
 .essence-egg-backdrop {
@@ -118,6 +121,25 @@ body[data-shell="popup"] .app-shell {
     background: linear-gradient(180deg, rgba(10, 18, 15, 0.62), rgba(10, 18, 15, 0.34));
     box-shadow: 0 30px 80px rgba(0, 0, 0, 0.42);
     pointer-events: auto;
+}
+
+.essence-egg-close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 2;
+    padding: 8px 10px;
+    border-radius: 999px;
+    background: rgba(4, 9, 7, 0.72);
+    color: rgba(236, 243, 238, 0.88);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    font-size: 12px;
+    font-weight: 900;
+    backdrop-filter: blur(10px);
+}
+
+.essence-egg-close:hover {
+    background: rgba(236, 243, 238, 0.14);
 }
 
 .essence-egg-kicker {
